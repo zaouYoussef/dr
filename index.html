@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Dr Mohamed Cherif Allali — Médecin Généraliste · Tanger</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Outfit:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+--teal:#00C9A7;--teal2:#00A38A;--teal3:#007A67;
+--navy:#020B18;--navy2:#041424;--navy3:#061D34;
+--white:#F0FAF8;--muted:#6B8FA8;
+--gold:#E8B86D;--gold2:#f5d48a;
+--glass:rgba(4,20,36,.72);
+--ease-out:cubic-bezier(.16,1,.3,1);
+--nav-h:80px;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Outfit',sans-serif;background:var(--navy);color:var(--white);overflow-x:hidden}
+body.custom-cursor{cursor:none}
+
+/* ── CURSOR ── */
+#cur,#cur2{display:none}
+body.custom-cursor #cur{display:block;position:fixed;width:8px;height:8px;background:var(--teal);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:width .2s,height .2s,background .3s}
+body.custom-cursor #cur2{display:block;position:fixed;width:36px;height:36px;border:1px solid rgba(0,201,167,.4);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:all .15s,box-shadow .4s}
+body.custom-cursor:has(a:hover) #cur,body.custom-cursor:has(button:hover) #cur{width:16px;height:16px;background:var(--gold)}
+body.custom-cursor:has(a:hover) #cur2,body.custom-cursor:has(button:hover) #cur2{width:56px;height:56px;border-color:rgba(232,184,109,.5);box-shadow:0 0 30px rgba(232,184,109,.15)}
+/* Cursor trail */
+#cur-trail{position:fixed;top:0;left:0;pointer-events:none;z-index:9997}
+.trail-dot{position:fixed;border-radius:50%;pointer-events:none;transform:translate(-50%,-50%)}
+
+/* ── NOISE OVERLAY ── */
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.015;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size:200px}
+
+#canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none}
+
+/* ── LOADER ── */
+#loader{position:fixed;inset:0;background:var(--navy);z-index:9990;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity 1s ease,visibility 1s ease}
+#loader.out{opacity:0;visibility:hidden}
+.load-txt{font-family:'Playfair Display',serif;font-size:clamp(1rem,3vw,1.2rem);font-weight:400;color:var(--teal);letter-spacing:.3em;text-transform:uppercase;margin-bottom:2rem;animation:loadPulse 1.5s ease-in-out infinite}
+@keyframes loadPulse{0%,100%{opacity:1;letter-spacing:.3em}50%{opacity:.6;letter-spacing:.45em}}
+.load-bar-wrap{width:min(200px,70vw);height:2px;background:rgba(0,201,167,.15);border-radius:2px;overflow:hidden}
+.load-bar{height:100%;width:0;background:linear-gradient(90deg,var(--teal3),var(--teal),var(--gold));transition:width .05s linear;box-shadow:0 0 12px var(--teal)}
+
+/* ── NAV ── */
+nav{position:fixed;top:0;left:0;right:0;z-index:200;height:var(--nav-h);display:flex;align-items:center;justify-content:space-between;padding:0 clamp(1rem,5vw,5%);transition:all .5s var(--ease-out)}
+nav.s{height:68px;background:var(--glass);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(0,201,167,.1);box-shadow:0 8px 32px rgba(0,0,0,.25)}
+.nav-glow{position:absolute;bottom:0;left:0;width:100%;height:1px;background:linear-gradient(90deg,transparent,var(--teal),transparent);transform:scaleX(0);transition:transform .8s var(--ease-out)}
+nav.s .nav-glow{transform:scaleX(1)}
+.nav-brand{display:flex;align-items:center;gap:.7rem;text-decoration:none;z-index:201}
+.nav-cross{width:28px;height:28px;position:relative;animation:crossSpin 8s linear infinite}
+@keyframes crossSpin{0%,90%{transform:rotate(0)}95%{transform:rotate(90deg)}100%{transform:rotate(0)}}
+.nav-cross::before,.nav-cross::after{content:'';position:absolute;background:var(--teal);border-radius:2px;box-shadow:0 0 8px rgba(0,201,167,.5)}
+.nav-cross::before{width:2px;height:100%;left:50%;transform:translateX(-50%)}
+.nav-cross::after{width:100%;height:2px;top:50%;transform:translateY(-50%)}
+.nav-name{font-size:clamp(.75rem,2vw,.85rem);letter-spacing:.15em;text-transform:uppercase;color:var(--white);font-weight:300}
+
+.nav-right{display:flex;align-items:center;gap:1rem}
+.nav-links{display:flex;gap:clamp(1rem,3vw,2.5rem);list-style:none}
+.nav-links a{font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);text-decoration:none;transition:color .3s;position:relative;padding:.25rem 0;overflow:hidden}
+.nav-links a span{display:block;transition:transform .4s var(--ease-out)}
+.nav-links a::after{content:attr(data-text);position:absolute;top:100%;left:0;color:var(--teal);font-size:.75rem;letter-spacing:.12em;transition:transform .4s var(--ease-out)}
+.nav-links a:hover span{transform:translateY(-100%)}
+.nav-links a:hover::after{transform:translateY(-100%)}
+.nav-links a:hover,.nav-links a.active{color:var(--teal)}
+.nav-link-line{position:absolute;bottom:-4px;left:0;width:100%;height:1px;background:linear-gradient(90deg,var(--teal),var(--gold));transform:scaleX(0);transition:transform .35s var(--ease-out);transform-origin:left}
+.nav-links a:hover .nav-link-line,.nav-links a.active .nav-link-line{transform:scaleX(1)}
+
+.nav-tel{display:flex;align-items:center;gap:.5rem;font-size:clamp(.65rem,2vw,.75rem);color:var(--teal);text-decoration:none;letter-spacing:.05em;border:1px solid rgba(0,201,167,.3);padding:.55rem 1.1rem;border-radius:30px;transition:all .35s;white-space:nowrap;background:rgba(0,201,167,.04);position:relative;overflow:hidden}
+.nav-tel::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(0,201,167,.15),transparent);transform:translateY(100%);transition:transform .4s}
+.nav-tel:hover::before{transform:translateY(0)}
+.nav-tel:hover{background:rgba(0,201,167,.12);box-shadow:0 0 30px rgba(0,201,167,.25),0 0 60px rgba(0,201,167,.08);transform:translateY(-2px)}
+
+.menu-btn{display:none;flex-direction:column;justify-content:center;gap:5px;width:44px;height:44px;background:rgba(0,201,167,.06);border:1px solid rgba(0,201,167,.2);border-radius:12px;cursor:pointer;z-index:201;padding:0 11px;transition:all .3s}
+.menu-btn:hover{border-color:rgba(0,201,167,.45);box-shadow:0 0 20px rgba(0,201,167,.12)}
+.menu-btn span{display:block;height:2px;background:var(--teal);border-radius:2px;transition:all .35s var(--ease-out);transform-origin:center}
+.menu-btn.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.menu-btn.open span:nth-child(2){opacity:0;transform:scaleX(0)}
+.menu-btn.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+
+.mobile-drawer{position:fixed;inset:0;background:rgba(2,11,24,.97);backdrop-filter:blur(24px);z-index:199;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2rem;opacity:0;visibility:hidden;transition:opacity .4s,visibility .4s;padding:2rem}
+.mobile-drawer.open{opacity:1;visibility:visible}
+.mobile-drawer a{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,6vw,2.5rem);color:var(--white);text-decoration:none;opacity:0;transform:translateY(24px);transition:all .5s var(--ease-out)}
+.mobile-drawer.open a{opacity:1;transform:none}
+.mobile-drawer.open a:nth-child(1){transition-delay:.05s}
+.mobile-drawer.open a:nth-child(2){transition-delay:.1s}
+.mobile-drawer.open a:nth-child(3){transition-delay:.15s}
+.mobile-drawer.open a:nth-child(4){transition-delay:.2s}
+.mobile-drawer.open a:nth-child(5){transition-delay:.25s}
+.mobile-drawer a:hover{color:var(--teal)}
+.mobile-drawer .drawer-tel{margin-top:1rem;font-family:'Outfit',sans-serif;font-size:1rem;padding:1rem 2rem;border:1px solid rgba(0,201,167,.35);border-radius:999px;color:var(--teal)}
+
+/* ── HERO ── */
+.hero{position:relative;min-height:100svh;display:flex;align-items:center;justify-content:center;overflow:hidden;z-index:1;padding:calc(var(--nav-h) + 2rem) 0 4rem;perspective:1200px}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(0,201,167,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(0,201,167,.04) 1px,transparent 1px);background-size:60px 60px;animation:gridShift 20s linear infinite;mask-image:radial-gradient(ellipse 80% 70% at 50% 50%,black 20%,transparent 100%)}
+@keyframes gridShift{from{background-position:0 0}to{background-position:60px 60px}}
+
+.hero-orb{position:absolute;border-radius:50%;filter:blur(80px);opacity:.35;pointer-events:none;animation:orbFloat 12s ease-in-out infinite}
+.hero-orb.o1{width:min(420px,60vw);height:min(420px,60vw);background:radial-gradient(circle,rgba(0,201,167,.35),transparent 70%);top:10%;left:-10%;animation-delay:0s}
+.hero-orb.o2{width:min(320px,50vw);height:min(320px,50vw);background:radial-gradient(circle,rgba(232,184,109,.2),transparent 70%);bottom:15%;right:-5%;animation-delay:-4s}
+.hero-orb.o3{width:min(200px,40vw);height:min(200px,40vw);background:radial-gradient(circle,rgba(0,163,138,.3),transparent 70%);top:40%;right:20%;animation-delay:-8s}
+@keyframes orbFloat{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(20px,-30px) scale(1.05)}66%{transform:translate(-15px,20px) scale(.95)}}
+
+.hero-inner{position:relative;z-index:2;text-align:center;max-width:920px;padding:0 clamp(1.25rem,5vw,5%);transform-style:preserve-3d;transition:transform .2s ease-out}
+.hero-chip{display:inline-flex;align-items:center;gap:.6rem;padding:.5rem 1.25rem;border:1px solid rgba(0,201,167,.3);border-radius:20px;font-size:clamp(.65rem,2vw,.72rem);letter-spacing:.15em;text-transform:uppercase;color:var(--teal);margin-bottom:clamp(1.5rem,4vw,2.5rem);backdrop-filter:blur(10px);background:rgba(0,201,167,.06);animation:chipGlow 3s ease-in-out infinite}
+@keyframes chipGlow{0%,100%{box-shadow:0 0 0 rgba(0,201,167,0)}50%{box-shadow:0 0 30px rgba(0,201,167,.15)}}
+.hero-chip .dot{width:6px;height:6px;background:var(--teal);border-radius:50%;animation:blink 1.5s ease-in-out infinite;box-shadow:0 0 8px var(--teal)}
+@keyframes blink{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.3;transform:scale(.8)}}
+
+.hero-title{font-family:'Playfair Display',serif;font-size:clamp(2.4rem,9vw,7rem);font-weight:400;line-height:1.05;margin-bottom:.5rem;overflow:hidden}
+.hero-title .line{display:block;overflow:hidden}
+.hero-title .word{display:inline-block;transform:translateY(110%);animation:slideWord .9s var(--ease-out) forwards}
+.hero-title .w1{animation-delay:.1s}
+.hero-title .w2{animation-delay:.25s}
+.hero-title .w3{animation-delay:.45s;font-style:italic;color:var(--teal)}
+@keyframes slideWord{to{transform:translateY(0)}}
+
+.hero-sub{font-size:clamp(.9rem,2.5vw,1.05rem);color:var(--muted);font-weight:300;letter-spacing:.02em;margin:1.5rem auto clamp(2rem,5vw,3rem);max-width:540px;line-height:1.85;opacity:0;animation:fadeUp .7s ease .7s forwards}
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+
+.hero-ctas{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;opacity:0;animation:fadeUp .7s ease .95s forwards}
+.btn-glow{display:inline-flex;align-items:center;justify-content:center;gap:.6rem;padding:clamp(.85rem,2vw,1rem) clamp(1.5rem,4vw,2.2rem);background:linear-gradient(135deg,var(--teal),var(--teal2));color:var(--navy);font-size:clamp(.8rem,2vw,.85rem);font-weight:500;letter-spacing:.06em;text-decoration:none;border-radius:30px;transition:all .35s var(--ease-out);box-shadow:0 0 30px rgba(0,201,167,.35);position:relative;overflow:hidden}
+.btn-glow::before{content:'';position:absolute;inset:0;background:linear-gradient(105deg,transparent 40%,rgba(255,255,255,.25) 50%,transparent 60%);transform:translateX(-100%);transition:transform .6s}
+.btn-glow:hover::before{transform:translateX(100%)}
+.btn-glow:hover{box-shadow:0 0 50px rgba(0,201,167,.55),0 0 100px rgba(0,201,167,.15);transform:translateY(-3px) scale(1.02)}
+.btn-outline2{display:inline-flex;align-items:center;justify-content:center;gap:.6rem;padding:clamp(.85rem,2vw,1rem) clamp(1.5rem,4vw,2.2rem);border:1px solid rgba(255,255,255,.15);color:var(--white);font-size:clamp(.8rem,2vw,.85rem);font-weight:300;text-decoration:none;border-radius:30px;transition:all .35s;backdrop-filter:blur(10px);position:relative;overflow:hidden}
+.btn-outline2::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(0,201,167,.1),transparent);transform:translateY(100%);transition:transform .4s}
+.btn-outline2:hover::before{transform:translateY(0)}
+.btn-outline2:hover{border-color:rgba(0,201,167,.45);color:var(--teal);background:rgba(0,201,167,.06);transform:translateY(-2px)}
+
+.scroll-ind{position:absolute;bottom:clamp(1.5rem,4vw,3rem);left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:.5rem;z-index:2;opacity:0;animation:fadeUp .7s ease 1.3s forwards}
+.scroll-ind span{font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+.scroll-line{width:1px;height:50px;background:linear-gradient(to bottom,var(--teal),transparent);animation:scrollPulse 2s ease infinite}
+@keyframes scrollPulse{0%,100%{opacity:.3;transform:scaleY(.5);transform-origin:top}50%{opacity:1;transform:scaleY(1);transform-origin:top}}
+
+/* ── SPARKLES ── */
+.sparkle{position:fixed;pointer-events:none;z-index:9995;font-size:0}
+.sparkle-inner{width:4px;height:4px;background:var(--teal);border-radius:50%;position:absolute;animation:sparkleFly 1s ease-out forwards}
+@keyframes sparkleFly{0%{transform:translate(0,0) scale(1);opacity:1}100%{transform:translate(var(--tx),var(--ty)) scale(0);opacity:0}}
+.sparkle-inner::before{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:10px;height:1px;background:linear-gradient(90deg,transparent,var(--teal),transparent)}
+
+/* ── MARQUEE ── */
+.marquee-wrap{position:relative;z-index:1;background:rgba(0,201,167,.06);border-top:1px solid rgba(0,201,167,.12);border-bottom:1px solid rgba(0,201,167,.12);padding:.85rem 0;overflow:hidden}
+.marquee-wrap:hover .marquee{animation-play-state:paused}
+.marquee{display:flex;gap:0;animation:marquee 28s linear infinite;white-space:nowrap;width:max-content}
+.marquee-item{font-size:clamp(.65rem,2vw,.75rem);letter-spacing:.18em;text-transform:uppercase;color:var(--teal);opacity:.65;padding:0 clamp(1.2rem,3vw,2.5rem);display:flex;align-items:center;gap:1rem;transition:opacity .3s,transform .3s}
+.marquee-wrap:hover .marquee-item:hover{opacity:1;transform:scale(1.05)}
+.marquee-item::after{content:'✦';opacity:.4}
+@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* ── STATS ── */
+.stats-section{position:relative;z-index:1;padding:clamp(3rem,8vw,6rem) clamp(1.25rem,5vw,5%)}
+.stats-grid{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:2px;border-radius:4px;overflow:hidden}
+.stat-box{background:var(--navy2);padding:clamp(1.75rem,4vw,3rem) clamp(1rem,3vw,2rem);text-align:center;position:relative;overflow:hidden;transition:all .45s var(--ease-out)}
+.stat-box::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--teal),var(--gold),transparent);transform:scaleX(0);transition:transform .6s}
+.stat-box::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 0%,rgba(0,201,167,.08),transparent 60%);opacity:0;transition:opacity .4s}
+.stat-box:hover::before{transform:scaleX(1)}
+.stat-box:hover::after{opacity:1}
+.stat-box:hover{background:var(--navy3);transform:translateY(-4px)}
+.stat-n{font-family:'Playfair Display',serif;font-size:clamp(2.2rem,6vw,3.5rem);font-weight:400;color:var(--teal);line-height:1;text-shadow:0 0 40px rgba(0,201,167,.35);position:relative}
+.stat-n::after{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:140%;height:140%;background:radial-gradient(circle,rgba(0,201,167,.08),transparent 70%);filter:blur(20px);pointer-events:none;z-index:-1}
+.stat-l{font-size:clamp(.65rem,2vw,.72rem);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-top:.6rem}
+
+/* ── SECTIONS ── */
+.sec{padding:clamp(4rem,10vw,8rem) clamp(1.25rem,5vw,5%);position:relative;z-index:1}
+.sec-max{max-width:1100px;margin:0 auto}
+.sec-eyebrow{font-size:.7rem;letter-spacing:.25em;text-transform:uppercase;color:var(--teal);margin-bottom:1rem;display:flex;align-items:center;gap:.8rem}
+.sec-eyebrow::before{content:'';width:30px;height:1px;background:linear-gradient(90deg,var(--teal),transparent);animation:eyebrowGrow 1s var(--ease-out) forwards}
+@keyframes eyebrowGrow{from{width:0}to{width:30px}}
+.sec-h{font-family:'Playfair Display',serif;font-size:clamp(1.9rem,5.5vw,3.8rem);font-weight:400;line-height:1.12}
+.sec-h em{font-style:italic;color:var(--teal)}
+
+/* ── ORNAMENT ── */
+.ornament{display:flex;align-items:center;justify-content:flex-start;gap:10px;opacity:.35;margin:10px 0 20px}
+.ornament .bar{width:24px;height:1px;background:var(--teal)}
+.ornament .diamond{width:7px;height:7px;border:1px solid var(--teal);transform:rotate(45deg);animation:ornPulse 2s ease-in-out infinite}
+@keyframes ornPulse{0%,100%{opacity:.4}50%{opacity:1}}
+
+/* ── SERVICES ── */
+.services-bg{background:var(--navy2);border-top:1px solid rgba(0,201,167,.06)}
+.srv-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;margin-top:clamp(2rem,5vw,4rem);background:rgba(0,201,167,.06);border-radius:4px;overflow:hidden}
+.srv-card{background:var(--navy2);padding:clamp(1.5rem,4vw,2.5rem);position:relative;overflow:hidden;cursor:default;transition:transform .45s var(--ease-out),background .4s,box-shadow .4s;transform-style:preserve-3d;will-change:transform}
+.srv-card::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at var(--mx,50%) var(--my,50%),rgba(0,201,167,.12),transparent 55%);opacity:0;transition:opacity .4s}
+.srv-card:hover{background:rgba(4,20,36,.85);box-shadow:inset 0 0 0 1px rgba(0,201,167,.15)}
+.srv-card:hover::after{opacity:1}
+.srv-num{font-size:clamp(2rem,5vw,3rem);font-weight:200;color:rgba(0,201,167,.12);font-family:'Playfair Display',serif;line-height:1;margin-bottom:1rem;transition:color .4s,transform .4s}
+.srv-card:hover .srv-num{color:rgba(0,201,167,.22);transform:translateX(4px)}
+.srv-icon-ring{width:52px;height:52px;border-radius:50%;border:1px solid rgba(0,201,167,.25);display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin-bottom:1.2rem;transition:all .45s var(--ease-out);animation:iconBob 4s ease-in-out infinite}
+.srv-card:nth-child(even) .srv-icon-ring{animation-delay:-2s}
+@keyframes iconBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+.srv-card:hover .srv-icon-ring{border-color:var(--teal);background:rgba(0,201,167,.1);box-shadow:0 0 24px rgba(0,201,167,.25);animation:none;transform:scale(1.08) rotate(5deg)}
+.srv-card h3{font-family:'Playfair Display',serif;font-size:clamp(1rem,2.5vw,1.15rem);font-weight:400;margin-bottom:.6rem}
+.srv-card p{font-size:clamp(.78rem,2vw,.82rem);color:var(--muted);line-height:1.75;font-weight:300}
+.srv-arrow{position:absolute;bottom:clamp(1rem,3vw,2rem);right:clamp(1rem,3vw,2rem);width:36px;height:36px;border:1px solid rgba(0,201,167,.25);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.85rem;color:var(--teal);opacity:0;transform:translate(-8px,8px);transition:all .45s var(--ease-out)}
+.srv-card:hover .srv-arrow{opacity:1;transform:translate(0,0)}
+.srv-card .srv-shine{position:absolute;top:0;left:-100%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(0,201,167,.04),transparent);transform:skewX(-25deg);transition:left .6s}
+.srv-card:hover .srv-shine{left:150%}
+
+/* ── ABOUT ── */
+.about-split{display:grid;grid-template-columns:1fr 1fr;gap:clamp(2.5rem,6vw,6rem);align-items:center}
+.about-visual-wrap{position:relative;max-width:420px;margin:0 auto;width:100%}
+.about-frame{position:relative;aspect-ratio:3/4;background:var(--navy2);border:1px solid rgba(0,201,167,.12);overflow:hidden;border-radius:4px}
+.about-frame-inner{width:100%;height:100%;background:linear-gradient(145deg,var(--navy2),var(--navy3));display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:'Playfair Display',serif}
+.monogram{font-size:clamp(5rem,18vw,9rem);font-weight:400;color:rgba(0,201,167,.08);letter-spacing:-.05em;line-height:1;animation:monoPulse 5s ease-in-out infinite}
+@keyframes monoPulse{0%,100%{opacity:.08;transform:scale(1)}50%{opacity:.14;transform:scale(1.02)}}
+.about-scan{position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--teal),transparent);animation:scan 4s ease-in-out infinite;box-shadow:0 0 16px var(--teal)}
+@keyframes scan{0%,100%{top:0;opacity:0}10%{opacity:1}90%{opacity:1}to{top:100%}}
+.about-corner{position:absolute;width:24px;height:24px;border-color:var(--teal);border-style:solid;transition:all .4s}
+.about-frame:hover .about-corner{width:32px;height:32px}
+.about-corner.tl{top:12px;left:12px;border-width:1px 0 0 1px}
+.about-corner.tr{top:12px;right:12px;border-width:1px 1px 0 0}
+.about-corner.bl{bottom:12px;left:12px;border-width:0 0 1px 1px}
+.about-corner.br{bottom:12px;right:12px;border-width:0 1px 1px 0}
+.about-data-badge{position:absolute;bottom:-1rem;right:-.5rem;background:var(--glass);border:1px solid rgba(0,201,167,.25);padding:1rem 1.25rem;backdrop-filter:blur(12px);border-radius:4px;animation:badgeFloat 5s ease-in-out infinite;box-shadow:0 12px 40px rgba(0,0,0,.3)}
+@keyframes badgeFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.about-data-badge .big{font-family:'Playfair Display',serif;font-size:clamp(1.5rem,4vw,2rem);color:var(--teal);text-shadow:0 0 20px rgba(0,201,167,.4)}
+.about-data-badge .sm{font-size:.68rem;letter-spacing:.1em;color:var(--muted);text-transform:uppercase}
+.about-desc{font-size:clamp(.85rem,2vw,.9rem);color:var(--muted);line-height:1.9;font-weight:300;margin:1.5rem 0 2rem}
+.about-pills{display:flex;flex-wrap:wrap;gap:.55rem;margin-top:1.5rem}
+.pill{padding:.4rem .95rem;border:1px solid rgba(0,201,167,.2);border-radius:20px;font-size:clamp(.65rem,2vw,.72rem);letter-spacing:.04em;color:var(--teal);transition:all .35s var(--ease-out);cursor:default}
+.pill:hover{background:rgba(0,201,167,.12);border-color:var(--teal);transform:translateY(-2px);box-shadow:0 4px 16px rgba(0,201,167,.15)}
+
+/* ── HORAIRES ── */
+.hor-bg{background:var(--navy2);border-top:1px solid rgba(0,201,167,.06)}
+.hor-grid{display:grid;grid-template-columns:1fr 1fr;gap:clamp(2rem,5vw,4rem);margin-top:clamp(2rem,5vw,4rem)}
+.hor-table{border:1px solid rgba(0,201,167,.1);border-radius:4px;overflow:hidden}
+.hor-row{display:flex;justify-content:space-between;align-items:center;gap:1rem;padding:clamp(.9rem,2vw,1.1rem) clamp(1rem,3vw,1.5rem);border-bottom:1px solid rgba(255,255,255,.03);transition:all .35s var(--ease-out);position:relative;overflow:hidden;flex-wrap:wrap}
+.hor-row::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,var(--teal),var(--gold));transform:scaleY(0);transition:transform .35s;transform-origin:center}
+.hor-row:hover::before,.hor-row.today::before{transform:scaleY(1)}
+.hor-row:hover{background:rgba(0,201,167,.05);padding-left:1.75rem}
+.hor-row.today{background:rgba(0,201,167,.07)}
+.hor-row.closed{opacity:.4}
+.hor-row:last-child{border-bottom:none}
+.hor-day{font-size:.82rem;font-weight:400}
+.hor-time{font-size:clamp(.72rem,2vw,.78rem);color:var(--teal);letter-spacing:.03em;text-align:right}
+.today-badge{font-size:.58rem;letter-spacing:.08em;background:rgba(0,201,167,.18);color:var(--teal);padding:.2rem .45rem;border-radius:4px;margin-left:.4rem;text-transform:uppercase;animation:badgeBlink 2s ease infinite}
+@keyframes badgeBlink{0%,100%{opacity:1}50%{opacity:.7}}
+
+/* ── CONTACT ── */
+.contact-wrap{display:flex;flex-direction:column;gap:1rem}
+.c-item{background:var(--navy3);border:1px solid rgba(0,201,167,.08);padding:clamp(1rem,3vw,1.3rem) clamp(1rem,3vw,1.5rem);display:flex;gap:1rem;align-items:flex-start;transition:all .35s var(--ease-out);border-radius:4px}
+.c-item:hover{border-color:rgba(0,201,167,.28);background:rgba(0,201,167,.05);transform:translateX(6px)}
+.c-ico{width:42px;height:42px;border:1px solid rgba(0,201,167,.22);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;border-radius:8px;transition:transform .35s}
+.c-item:hover .c-ico{transform:scale(1.08) rotate(-5deg)}
+.c-lbl{font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:.25rem}
+.c-val{font-size:clamp(.82rem,2vw,.88rem);color:var(--white);line-height:1.5}
+.c-val a{color:var(--teal);text-decoration:none;transition:opacity .3s}
+.c-val a:hover{opacity:.8;text-decoration:underline}
+
+.actes-wrap{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:clamp(2rem,4vw,3rem)}
+.acte{padding:.5rem 1rem;border:1px solid rgba(0,201,167,.12);font-size:clamp(.7rem,2vw,.75rem);color:var(--muted);letter-spacing:.03em;transition:all .35s var(--ease-out);cursor:default;position:relative;overflow:hidden;border-radius:4px}
+.acte::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,var(--teal),var(--teal2));transform:scaleX(0);transform-origin:left;transition:transform .35s;z-index:-1}
+.acte:hover{color:var(--navy);border-color:var(--teal);transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,201,167,.2)}
+.acte:hover::before{transform:scaleX(1)}
+
+.map-frame{width:100%;height:clamp(220px,40vw,280px);border:1px solid rgba(0,201,167,.12);position:relative;overflow:hidden;margin-top:1.5rem;border-radius:4px}
+.map-frame iframe{width:100%;height:100%;border:none;filter:grayscale(100%) invert(85%) hue-rotate(145deg) brightness(.9);transition:filter .5s}
+.map-frame:hover iframe{filter:grayscale(60%) invert(85%) hue-rotate(145deg) brightness(.95)}
+
+/* ── CTA ── */
+.cta-big{padding:clamp(5rem,12vw,10rem) clamp(1.25rem,5vw,5%);text-align:center;position:relative;z-index:1;overflow:hidden}
+.cta-circle{position:absolute;border-radius:50%;border:1px solid rgba(0,201,167,.06);top:50%;left:50%;transform:translate(-50%,-50%);animation:ctaRing 8s ease-in-out infinite}
+.cta-circle:nth-child(1){width:min(600px,90vw);height:min(600px,90vw)}
+.cta-circle:nth-child(2){width:min(400px,70vw);height:min(400px,70vw);border-color:rgba(0,201,167,.1);animation-delay:-2s}
+.cta-circle:nth-child(3){width:min(200px,50vw);height:min(200px,50vw);border-color:rgba(0,201,167,.18);animation-delay:-4s}
+@keyframes ctaRing{0%,100%{transform:translate(-50%,-50%) scale(1);opacity:.6}50%{transform:translate(-50%,-50%) scale(1.06);opacity:1}}
+.cta-h{font-family:'Playfair Display',serif;font-size:clamp(2rem,7vw,6rem);font-weight:400;line-height:1.08;position:relative;z-index:1}
+.cta-h em{color:var(--teal);font-style:italic}
+.cta-p{font-size:clamp(.85rem,2.5vw,.95rem);color:var(--muted);max-width:460px;margin:1.5rem auto clamp(2rem,4vw,3rem);position:relative;z-index:1;line-height:1.85;font-weight:300}
+.cta-actions{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;position:relative;z-index:1}
+
+/* ── FOOTER ── */
+footer{background:var(--navy);border-top:1px solid rgba(0,201,167,.08);padding:clamp(2rem,5vw,3rem) clamp(1.25rem,5vw,5%);z-index:1;position:relative}
+.foot-in{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1.5rem}
+.foot-brand{font-family:'Playfair Display',serif;font-size:clamp(.9rem,2.5vw,1rem);font-weight:400;color:var(--white)}
+.foot-brand span{color:var(--teal)}
+.foot-links{display:flex;flex-wrap:wrap;gap:clamp(1rem,3vw,2rem)}
+.foot-links a{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);text-decoration:none;transition:color .3s,transform .3s;display:inline-block;position:relative}
+.foot-links a::after{content:'';position:absolute;bottom:-2px;left:0;width:100%;height:1px;background:var(--teal);transform:scaleX(0);transition:transform .3s;transform-origin:right}
+.foot-links a:hover::after{transform:scaleX(1);transform-origin:left}
+.foot-links a:hover{color:var(--teal);transform:translateY(-2px)}
+.foot-copy{font-size:.72rem;color:rgba(255,255,255,.25);letter-spacing:.05em;width:100%;text-align:center;margin-top:.5rem}
+
+/* ── FAB ── */
+.fab-call{position:fixed;bottom:max(1.25rem,env(safe-area-inset-bottom));right:max(1.25rem,env(safe-area-inset-right));width:56px;height:56px;background:linear-gradient(135deg,var(--teal),var(--teal2));border-radius:50%;display:none;align-items:center;justify-content:center;color:var(--navy);text-decoration:none;z-index:150;box-shadow:0 8px 32px rgba(0,201,167,.45);animation:fabPulse 2.5s ease-in-out infinite;transition:transform .3s}
+.fab-call:hover{transform:scale(1.08)}
+@keyframes fabPulse{0%,100%{box-shadow:0 8px 32px rgba(0,201,167,.4)}50%{box-shadow:0 8px 48px rgba(0,201,167,.65),0 0 0 12px rgba(0,201,167,.08)}}
+
+/* ── REVEAL ── */
+.rv{opacity:0;transform:translateY(36px);transition:opacity .85s var(--ease-out),transform .85s var(--ease-out)}
+.rv.ok{opacity:1;transform:none}
+.rv.from-left{transform:translateX(-36px)}
+.rv.from-left.ok{transform:none}
+.rv.scale-in{transform:scale(.92)}
+.rv.scale-in.ok{transform:none}
+.rv.d1{transition-delay:.08s}.rv.d2{transition-delay:.16s}.rv.d3{transition-delay:.24s}.rv.d4{transition-delay:.32s}.rv.d5{transition-delay:.4s}.rv.d6{transition-delay:.48s}
+
+/* ── GLITCH ── */
+.glitch{position:relative}
+.glitch::before,.glitch::after{content:attr(data-txt);position:absolute;top:0;left:0;width:100%;overflow:hidden;pointer-events:none}
+.glitch::before{color:rgba(0,201,167,.5);animation:glitch1 4s infinite;clip-path:polygon(0 0,100% 0,100% 35%,0 35%)}
+.glitch::after{color:rgba(232,184,109,.4);animation:glitch2 4s infinite;clip-path:polygon(0 65%,100% 65%,100% 100%,0 100%)}
+@keyframes glitch1{0%,92%,100%{transform:translate(0)}94%{transform:translate(-3px,1px)}96%{transform:translate(3px,-1px)}}
+@keyframes glitch2{0%,92%,100%{transform:translate(0)}94%{transform:translate(3px,-1px)}96%{transform:translate(-3px,1px)}}
+
+/* ── RIPPLE ── */
+.ripple-el{position:fixed;width:60px;height:60px;border-radius:50%;background:rgba(0,201,167,.15);pointer-events:none;animation:rippleFX .8s ease-out forwards;z-index:9000}
+@keyframes rippleFX{0%{transform:translate(-50%,-50%) scale(0);opacity:.6}100%{transform:translate(-50%,-50%) scale(4);opacity:0}}
+
+/* ── PROGRESS ── */
+.prog-line{position:fixed;top:0;left:0;height:2px;background:linear-gradient(90deg,var(--teal3),var(--teal),var(--gold),var(--teal));background-size:200%;z-index:10000;transform-origin:left;transform:scaleX(0);transition:transform .1s;animation:shimmerProg 2s linear infinite}
+@keyframes shimmerProg{0%{background-position:0% center}100%{background-position:200% center}}
+
+/* ── MOUSE GLOW ── */
+.mouse-glow{position:fixed;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle,rgba(0,201,167,.03),transparent 60%);pointer-events:none;z-index:0;transform:translate(-50%,-50%);transition:left .15s ease-out,top .15s ease-out;will-change:left,top}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:var(--navy)}
+::-webkit-scrollbar-thumb{background:rgba(0,201,167,.35);border-radius:3px}
+
+/* ── RESPONSIVE ── */
+@media(max-width:1100px){
+.srv-grid{grid-template-columns:repeat(2,1fr)}
+.stats-grid{grid-template-columns:repeat(2,1fr)}
+}
+
+@media(max-width:1024px){
+.nav-links{display:none}
+.menu-btn{display:flex}
+}
+@media(max-width:768px){
+:root{--nav-h:72px}
+.nav-tel{display:none}
+.fab-call{display:flex}
+.about-split{grid-template-columns:1fr;gap:3rem}
+.about-visual-wrap{order:-1;max-width:320px}
+.about-data-badge{right:0;bottom:-.75rem}
+.hor-grid{grid-template-columns:1fr}
+.hor-row:hover{padding-left:1.25rem}
+.cta-big{padding-top:4rem;padding-bottom:4rem}
+.foot-in{flex-direction:column;text-align:center}
+.foot-links{justify-content:center}
+.mouse-glow{display:none}
+}
+
+@media(max-width:540px){
+.srv-grid{grid-template-columns:1fr}
+.stats-grid{grid-template-columns:1fr 1fr}
+.stat-box:nth-child(4){grid-column:span 2}
+.hero-ctas{flex-direction:column;width:100%;max-width:320px;margin:0 auto}
+.hero-ctas a{width:100%}
+.scroll-ind{display:none}
+}
+
+@media(max-width:380px){
+.stats-grid{grid-template-columns:1fr}
+.stat-box:nth-child(4){grid-column:span 1}
+#canvas{display:none}
+.hero-orb{opacity:.15}
+}
+
+@media(hover:none){
+body.custom-cursor{cursor:auto}
+#cur,#cur2{display:none!important}
+#cur-trail{display:none!important}
+.srv-card:hover{transform:none}
+}
+
+@media(prefers-reduced-motion:reduce){
+*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+html{scroll-behavior:auto}
+.rv{opacity:1;transform:none}
+}
+</style>
+</head>
+<body>
+
+<div id="loader">
+  <div class="load-txt">Dr Allali</div>
+  <div class="load-bar-wrap"><div class="load-bar" id="bar"></div></div>
+</div>
+
+<!-- PROGRESS -->
+<div class="prog-line" id="prog"></div>
+
+<!-- CURSOR -->
+<div id="cur"></div>
+<div id="cur2"></div>
+<div id="cur-trail"></div>
+
+<!-- MOUSE GLOW -->
+<div class="mouse-glow" id="mouseGlow"></div>
+
+<canvas id="canvas"></canvas>
+
+<nav id="nav">
+  <div class="nav-glow"></div>
+  <a href="#" class="nav-brand">
+    <div class="nav-cross"></div>
+    <span class="nav-name">Dr Allali</span>
+  </a>
+  <div class="nav-right">
+    <ul class="nav-links">
+      <li><a href="#services" data-text="Services"><span>Services</span><div class="nav-link-line"></div></a></li>
+      <li><a href="#about" data-text="Médecin"><span>Médecin</span><div class="nav-link-line"></div></a></li>
+      <li><a href="#horaires" data-text="Horaires"><span>Horaires</span><div class="nav-link-line"></div></a></li>
+      <li><a href="#contact" data-text="Contact"><span>Contact</span><div class="nav-link-line"></div></a></li>
+    </ul>
+    <a href="tel:+212624868778" class="nav-tel">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.8a19.79 19.79 0 01-3.07-8.67A2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+      +212 624 86 87 78
+    </a>
+    <button class="menu-btn" id="menuBtn" aria-label="Ouvrir le menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<div class="mobile-drawer" id="drawer" aria-hidden="true">
+  <a href="#services" data-nav>Services</a>
+  <a href="#about" data-nav>Médecin</a>
+  <a href="#horaires" data-nav>Horaires</a>
+  <a href="#contact" data-nav>Contact</a>
+  <a href="tel:+212624868778" class="drawer-tel">📞 Appeler le cabinet</a>
+</div>
+
+<section class="hero" id="hero-tilt">
+  <div class="hero-grid"></div>
+  <div class="hero-orb o1"></div>
+  <div class="hero-orb o2"></div>
+  <div class="hero-orb o3"></div>
+  <div class="hero-inner" id="heroInner">
+    <div class="hero-chip"><span class="dot"></span>Médecin Généraliste · Tanger, Maroc</div>
+    <h1 class="hero-title">
+      <span class="line"><span class="word w1">Dr Mohamed</span></span>
+      <span class="line"><span class="word w2">Cherif</span> <span class="word w3 glitch" data-txt="Allali">Allali</span></span>
+    </h1>
+    <p class="hero-sub">Médecine générale complète, humaine et personnalisée. Cabinet moderne au cœur de Boukhalef, Tanger — à votre service 6 jours sur 7.</p>
+    <div class="hero-ctas">
+      <a href="tel:+212624868778" class="btn-glow">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.8a19.79 19.79 0 01-3.07-8.67A2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+        Appeler maintenant
+      </a>
+      <a href="#services" class="btn-outline2">Découvrir ↓</a>
+    </div>
+  </div>
+  <div class="scroll-ind">
+    <span>Défiler</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<div class="marquee-wrap">
+  <div class="marquee">
+    <span class="marquee-item">ECG</span><span class="marquee-item">Vaccination</span><span class="marquee-item">Diabète</span>
+    <span class="marquee-item">Hypertension</span><span class="marquee-item">Suivi grossesse</span><span class="marquee-item">Permis de conduire</span>
+    <span class="marquee-item">Phytothérapie</span><span class="marquee-item">Botox</span><span class="marquee-item">Hijama</span>
+    <span class="marquee-item">Acupuncture</span><span class="marquee-item">Echographie</span><span class="marquee-item">Holter 24H</span>
+    <span class="marquee-item">ECG</span><span class="marquee-item">Vaccination</span><span class="marquee-item">Diabète</span>
+    <span class="marquee-item">Hypertension</span><span class="marquee-item">Suivi grossesse</span><span class="marquee-item">Permis de conduire</span>
+    <span class="marquee-item">Phytothérapie</span><span class="marquee-item">Botox</span><span class="marquee-item">Hijama</span>
+    <span class="marquee-item">Acupuncture</span><span class="marquee-item">Echographie</span><span class="marquee-item">Holter 24H</span>
+  </div>
+</div>
+
+<div class="stats-section">
+  <div class="stats-grid rv">
+    <div class="stat-box rv d1"><div class="stat-n" data-n="6">0</div><div class="stat-l">Jours / semaine</div></div>
+    <div class="stat-box rv d2"><div class="stat-n" data-n="30">0</div><div class="stat-l">Actes médicaux</div></div>
+    <div class="stat-box rv d3"><div class="stat-n" data-n="20">0</div><div class="stat-l">Ans d'expérience</div></div>
+    <div class="stat-box rv d4"><div class="stat-n" style="font-size:clamp(1.4rem,4vw,2rem);color:var(--gold);text-shadow:0 0 20px rgba(232,184,109,.4)">Agréé</div><div class="stat-l">Permis de conduire</div></div>
+  </div>
+</div>
+
+<div id="services" class="services-bg">
+<div class="sec">
+<div class="sec-max">
+  <div class="rv"><div class="sec-eyebrow">Services médicaux</div><h2 class="sec-h">Une prise en charge<br><em>globale et experte</em></h2><div class="ornament"><div class="bar"></div><div class="diamond"></div><div class="bar"></div></div></div>
+  <div class="srv-grid">
+    <div class="srv-card rv d1"><div class="srv-shine"></div><div class="srv-num">01</div><div class="srv-icon-ring">🫀</div><h3>Cardiologie de base</h3><p>ECG, Holter tensionnel 24h, suivi hypertension et monitoring cardiovasculaire complet.</p><div class="srv-arrow">→</div></div>
+    <div class="srv-card rv d2"><div class="srv-shine"></div><div class="srv-num">02</div><div class="srv-icon-ring">💉</div><h3>Vaccination & Prévention</h3><p>Protocoles vaccinaux adultes et enfants, tests rapides COVID-19, bilans préventifs.</p><div class="srv-arrow">→</div></div>
+    <div class="srv-card rv d3"><div class="srv-shine"></div><div class="srv-num">03</div><div class="srv-icon-ring">🩺</div><h3>Maladies chroniques</h3><p>Diabète, dyslipidémie, pied diabétique — suivi rigoureux et personnalisé à long terme.</p><div class="srv-arrow">→</div></div>
+    <div class="srv-card rv d4"><div class="srv-shine"></div><div class="srv-num">04</div><div class="srv-icon-ring">🤰</div><h3>Suivi de grossesse</h3><p>Échographie obstétricale, suivi prénatal complet, accompagnement mère-enfant.</p><div class="srv-arrow">→</div></div>
+    <div class="srv-card rv d5"><div class="srv-shine"></div><div class="srv-num">05</div><div class="srv-icon-ring">🌿</div><h3>Médecine naturelle</h3><p>Phytothérapie, nutrithérapie, homéopathie, acupuncture et La Hijama.</p><div class="srv-arrow">→</div></div>
+    <div class="srv-card rv d6"><div class="srv-shine"></div><div class="srv-num">06</div><div class="srv-icon-ring">✨</div><h3>Esthétique médicale</h3><p>Botox, acide hyaluronique, PRP, peeling, hydrafacial, greffe de cheveux FUE/FUT.</p><div class="srv-arrow">→</div></div>
+  </div>
+</div>
+</div>
+</div>
+
+<div id="about">
+<div class="sec">
+<div class="sec-max">
+  <div class="about-split">
+    <div class="about-visual-wrap rv from-left">
+      <div class="about-frame">
+        <div class="about-frame-inner">
+          <div class="monogram">MA</div>
+          <div style="font-size:.7rem;letter-spacing:.2em;color:rgba(0,201,167,.3);margin-top:1rem;text-transform:uppercase">Dr M. C. Allali</div>
+        </div>
+        <div class="about-scan"></div>
+        <div class="about-corner tl"></div><div class="about-corner tr"></div>
+        <div class="about-corner bl"></div><div class="about-corner br"></div>
+      </div>
+      <div class="about-data-badge">
+        <div class="big">20+</div>
+        <div class="sm">Années d'exercice</div>
+      </div>
+    </div>
+    <div class="about-text-wrap">
+      <div class="rv"><div class="sec-eyebrow">À propos du médecin</div><h2 class="sec-h">Votre santé<br>entre des mains<br><em>expertes</em></h2><div class="ornament"><div class="bar"></div><div class="diamond"></div><div class="bar"></div></div></div>
+      <p class="about-desc rv d1">Le Dr Mohamed Cherif Allali exerce la médecine générale à Tanger depuis plus de 20 ans. Son approche globale combine médecine conventionnelle et pratiques complémentaires pour offrir des soins adaptés à chaque patient.</p>
+      <p class="about-desc rv d2" style="margin-top:0">Consultations disponibles en français et en arabe. Cabinet moderne équipé au cœur de Boukhalef, accessible et accueillant.</p>
+      <div class="about-pills rv d3">
+        <span class="pill">Médecin généraliste</span><span class="pill">Agréé permis de conduire</span>
+        <span class="pill">Consultations en français</span><span class="pill">Paiement CB accepté</span>
+        <span class="pill">6 jours / 7</span><span class="pill">Tiers payant conventionné</span>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
+<div id="horaires" class="hor-bg">
+<div class="sec">
+<div class="sec-max">
+  <div class="rv"><div class="sec-eyebrow">Horaires & Contact</div><h2 class="sec-h">Disponible<br><em>pour vous</em></h2><div class="ornament"><div class="bar"></div><div class="diamond"></div><div class="bar"></div></div></div>
+  <div class="hor-grid">
+    <div class="rv d1">
+      <div class="hor-table">
+        <div class="hor-row closed" id="r0"><span class="hor-day">Dimanche</span><span style="font-size:.72rem;color:var(--muted);font-style:italic">Fermé</span></div>
+        <div class="hor-row" id="r1"><span class="hor-day">Lundi</span><span class="hor-time">09:00–13:00 · 15:00–19:00</span></div>
+        <div class="hor-row" id="r2"><span class="hor-day">Mardi</span><span class="hor-time">09:00–13:00 · 15:00–19:00</span></div>
+        <div class="hor-row" id="r3"><span class="hor-day">Mercredi</span><span class="hor-time">09:00–13:00 · 15:00–19:00</span></div>
+        <div class="hor-row" id="r4"><span class="hor-day">Jeudi</span><span class="hor-time">09:00–13:00 · 15:00–19:00</span></div>
+        <div class="hor-row" id="r5"><span class="hor-day">Vendredi</span><span class="hor-time">09:00–13:00 · 15:00–19:00</span></div>
+        <div class="hor-row" id="r6"><span class="hor-day">Samedi</span><span class="hor-time">09:00–13:00</span></div>
+      </div>
+    </div>
+    <div id="contact" class="rv d2">
+      <div class="contact-wrap">
+        <div class="c-item rv d1"><div class="c-ico">📍</div><div><div class="c-lbl">Adresse</div><div class="c-val">Compl. Al Irfane Doha GH 358, Imm 341, ETG 1 N10 — Boukhalef, Tanger</div></div></div>
+        <div class="c-item rv d2"><div class="c-ico">📞</div><div><div class="c-lbl">Téléphone</div><div class="c-val"><a href="tel:+212624868778">+212 624 86 87 78</a></div></div></div>
+        <div class="c-item rv d3"><div class="c-ico">🌍</div><div><div class="c-lbl">Langues</div><div class="c-val">Français · Arabe</div></div></div>
+        <div class="c-item rv d4"><div class="c-ico">💳</div><div><div class="c-lbl">Paiement</div><div class="c-val">Espèces · Carte bancaire · Chèque</div></div></div>
+      </div>
+      <div class="map-frame rv scale-in">
+        <iframe src="https://maps.google.com/maps?q=Boukhalef+Tanger+Maroc&output=embed" allowfullscreen loading="lazy" title="Carte du cabinet"></iframe>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
+<div class="sec">
+<div class="sec-max">
+  <div class="rv"><div class="sec-eyebrow">Catalogue des actes</div><h2 class="sec-h">Tous nos <em>soins</em></h2><div class="ornament"><div class="bar"></div><div class="diamond"></div><div class="bar"></div></div></div>
+  <div class="actes-wrap rv d1">
+    <span class="acte">Électrocardiogramme ECG</span><span class="acte">Holter tensionnel 24H</span><span class="acte">Vaccination</span>
+    <span class="acte">Tests rapides Covid-19</span><span class="acte">Suivi diabète</span><span class="acte">Suivi hypertension</span>
+    <span class="acte">Dyslipidémie</span><span class="acte">Pied diabétique</span><span class="acte">Suivi grossesse</span>
+    <span class="acte">Échographie obstétricale</span><span class="acte">Échographie abdominale</span><span class="acte">Frottis cervico-vaginal</span>
+    <span class="acte">Injection PRP</span><span class="acte">Toxine botulique BOTOX</span><span class="acte">Acide hyaluronique</span>
+    <span class="acte">Hydrafacial</span><span class="acte">Peeling</span><span class="acte">Greffe FUE / FUT</span>
+    <span class="acte">Sclérothérapie varices</span><span class="acte">Exérèse kyste / naevus</span><span class="acte">Circoncision</span>
+    <span class="acte">Phytothérapie</span><span class="acte">Nutrithérapie</span><span class="acte">Homéopathie</span>
+    <span class="acte">Acupuncture</span><span class="acte">Auriculothérapie</span><span class="acte">La Hijama</span>
+    <span class="acte">Hypnose thérapeutique</span><span class="acte">Oligoscan</span><span class="acte">Bilan santé oligocheck</span>
+    <span class="acte">Pose de perfusions</span><span class="acte">Oxygénothérapie</span><span class="acte">Consultation mémoire</span>
+    <span class="acte">Permis de conduire</span><span class="acte">Check-up médical</span><span class="acte">Cryolipolyse</span>
+  </div>
+</div>
+</div>
+
+<div class="cta-big rv">
+  <div class="cta-circle"></div><div class="cta-circle"></div><div class="cta-circle"></div>
+  <h2 class="cta-h">Prenez soin<br>de <em>vous, aujourd'hui</em></h2>
+  <p class="cta-p">Le cabinet du Dr Allali est ouvert du lundi au samedi. Appelez-nous pour prendre rendez-vous ou pour toute urgence médicale.</p>
+  <div class="cta-actions">
+    <a href="tel:+212624868778" class="btn-glow" onClick="createSparkles(event.clientX||window.innerWidth/2,event.clientY||window.innerHeight/2,12)">📞 +212 624 86 87 78</a>
+    <a href="#horaires" class="btn-outline2">Voir les horaires</a>
+  </div>
+</div>
+
+<footer>
+  <div class="foot-in">
+    <div class="foot-brand">Dr. <span>Allali</span> — Médecin Généraliste</div>
+    <div class="foot-links">
+      <a href="#services">Services</a><a href="#about">Médecin</a><a href="#horaires">Horaires</a>
+    </div>
+    <div class="foot-copy">© 2026 · Tanger, Maroc</div>
+  </div>
+</footer>
+
+<a href="tel:+212624868778" class="fab-call" aria-label="Appeler le cabinet">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.8a19.79 19.79 0 01-3.07-8.67A2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+</a>
+
+<script>
+// ── LOADER ──
+(function(){
+  const bar=document.getElementById('bar'),ldr=document.getElementById('loader');
+  let p=0;
+  const iv=setInterval(()=>{
+    p+=Math.random()*12+3;
+    if(p>=100){p=100;clearInterval(iv);setTimeout(()=>ldr.classList.add('out'),300)}
+    bar.style.width=Math.min(p,100)+'%';
+  },60);
+})();
+
+// ── CURSOR ──
+if(window.matchMedia('(hover:hover) and (pointer:fine)').matches){
+  document.body.classList.add('custom-cursor');
+  const c=document.getElementById('cur'),r=document.getElementById('cur2');
+  let mx=0,my=0,rx=0,ry=0;
+  document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;c.style.left=mx+'px';c.style.top=my+'px'});
+  (function loop(){rx+=(mx-rx)*.12;ry+=(my-ry)*.12;r.style.left=rx+'px';r.style.top=ry+'px';requestAnimationFrame(loop)})();
+  
+  // Cursor trail
+  const trailContainer=document.getElementById('cur-trail');
+  const trail=[];const TRAIL_LEN=12;
+  for(let i=0;i<TRAIL_LEN;i++){
+    const d=document.createElement('div');d.className='trail-dot';
+    d.style.opacity=(1-(i/TRAIL_LEN))*.25;
+    d.style.width=d.style.height=(4-(i*.25))+'px';
+    d.style.background=i<3?'var(--teal)':'rgba(0,201,167,'+(.4-(i*.03))+')';
+    trailContainer.appendChild(d);
+    trail.push({el:d,x:window.innerWidth/2,y:window.innerHeight/2});
+  }
+  let lx=[],ly=[];
+  for(let i=0;i<TRAIL_LEN;i++){lx.push(window.innerWidth/2);ly.push(window.innerHeight/2)}
+  document.addEventListener('mousemove',e=>{lx.unshift(e.clientX);lx.pop();ly.unshift(e.clientY);ly.pop()});
+  (function trailAnim(){
+    trail.forEach((t,i)=>{t.x+=(lx[i]-t.x)*.35;t.y+=(ly[i]-t.y)*.35;t.el.style.left=t.x+'px';t.el.style.top=t.y+'px'});
+    requestAnimationFrame(trailAnim)
+  })();
+}
+
+// ── MOUSE GLOW ──
+const mg=document.getElementById('mouseGlow');
+document.addEventListener('mousemove',e=>{
+  mg.style.left=e.clientX+'px';mg.style.top=e.clientY+'px';
+});
+
+// ── WEBGL CANVAS ──
+(function(){
+  const cv=document.getElementById('canvas'),ctx=cv.getContext('2d');
+  let W,H,pts=[];
+  const reduced=window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+  function resize(){W=cv.width=window.innerWidth;H=cv.height=window.innerHeight}
+  window.addEventListener('resize',()=>{resize();init()});
+  resize();
+  function init(){
+    pts=[];
+    const density=reduced?18000:12000;
+    const N=Math.min(Math.floor((W*H)/density),reduced?40:120);
+    for(let i=0;i<N;i++)pts.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.3,vy:(Math.random()-.5)*.3,r:Math.random()*1.5+.5,a:Math.random()*.5+.1});
+  }
+  init();
+  let mx=W/2,my=H/2;
+  document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY});
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    pts.forEach(p=>{
+      p.x+=p.vx;p.y+=p.vy;
+      if(p.x<0)p.x=W;if(p.x>W)p.x=0;if(p.y<0)p.y=H;if(p.y>H)p.y=0;
+      ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(0,201,167,${p.a*.35})`;ctx.fill();
+      ctx.beginPath();ctx.arc(p.x,p.y,p.r*2,0,Math.PI*2);
+      ctx.fillStyle=`rgba(0,201,167,${p.a*.1})`;ctx.fill();
+    });
+    if(!reduced){
+      pts.forEach((a,i)=>{
+        pts.slice(i+1).forEach(b=>{
+          const d=Math.hypot(a.x-b.x,a.y-b.y);
+          if(d<120){ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.strokeStyle=`rgba(0,201,167,${(1-d/120)*.06})`;ctx.lineWidth=.5;ctx.stroke()}
+        });
+        const d=Math.hypot(a.x-mx,a.y-my);
+        if(d<150){a.vx+=(a.x-mx)/d*.02;a.vy+=(a.y-my)/d*.02}
+      });
+    }
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// ── NAV ──
+(function(){
+  const nav=document.getElementById('nav'),btn=document.getElementById('menuBtn'),drawer=document.getElementById('drawer');
+  window.addEventListener('scroll',()=>nav.classList.toggle('s',window.scrollY>60));
+  btn.addEventListener('click',()=>{
+    const open=btn.classList.toggle('open');
+    drawer.classList.toggle('open',open);
+    btn.setAttribute('aria-expanded',open);
+    drawer.setAttribute('aria-hidden',!open);
+    document.body.style.overflow=open?'hidden':'';
+  });
+  document.querySelectorAll('[data-nav]').forEach(a=>{
+    a.addEventListener('click',()=>{
+      btn.classList.remove('open');drawer.classList.remove('open');
+      btn.setAttribute('aria-expanded','false');drawer.setAttribute('aria-hidden','true');
+      document.body.style.overflow='';
+    });
+  });
+})();
+
+// ── ACTIVE NAV ──
+(function(){
+  const links=document.querySelectorAll('[data-nav]');
+  const sections=[...links].map(a=>document.querySelector(a.getAttribute('href'))).filter(Boolean);
+  const obs=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        links.forEach(l=>l.classList.toggle('active',l.getAttribute('href')==='#'+e.target.id));
+      }
+    });
+  },{rootMargin:'-40% 0px -55% 0px'});
+  sections.forEach(s=>obs.observe(s));
+})();
+
+// ── REVEAL ──
+(function(){
+  const obs=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('ok')}),{threshold:.12,rootMargin:'0px 0px -40px 0px'});
+  document.querySelectorAll('.rv').forEach(el=>obs.observe(el));
+})();
+
+// ── COUNTER ──
+(function(){
+  function count(el,target){
+    const dur=1500,start=performance.now();
+    (function loop(now){
+      const p=Math.min((now-start)/dur,1),ease=1-Math.pow(1-p,3);
+      el.textContent=Math.round(ease*target)+(p>=1?'+':'');
+      if(p<1)requestAnimationFrame(loop);
+    })(start);
+  }
+  const obs=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{if(e.isIntersecting){const n=parseInt(e.target.dataset.n);if(n)count(e.target,n);obs.unobserve(e.target)}});
+  },{threshold:.5});
+  document.querySelectorAll('[data-n]').forEach(el=>obs.observe(el));
+})();
+
+// ── TODAY ──
+(function(){
+  const d=new Date().getDay(),row=document.getElementById('r'+d);
+  if(row&&d!==0){
+    row.classList.add('today');
+    const day=row.querySelector('.hor-day');
+    if(day&&!day.querySelector('.today-badge')){const b=document.createElement('span');b.className='today-badge';b.textContent="Aujourd'hui";day.appendChild(b)}
+  }
+  if(d===0)document.getElementById('r0').classList.add('today');
+})();
+
+// ── 3D TILT CARDS ──
+document.querySelectorAll('.srv-card').forEach(card=>{
+  card.addEventListener('mousemove',e=>{
+    const r=card.getBoundingClientRect();
+    card.style.setProperty('--mx',((e.clientX-r.left)/r.width*100).toFixed(1)+'%');
+    card.style.setProperty('--my',((e.clientY-r.top)/r.height*100).toFixed(1)+'%');
+    if(window.matchMedia('(hover:hover)').matches){
+      const cx=r.left+r.width/2,cy=r.top+r.height/2;
+      card.style.transform=`perspective(800px) rotateX(${(cy-e.clientY)/25}deg) rotateY(${(e.clientX-cx)/25}deg)`;
+    }
+  });
+  card.addEventListener('mouseleave',()=>{card.style.transform=''});
+});
+
+// ── HERO 3D TILT ──
+const heroEl=document.getElementById('hero-tilt');
+const heroInner=document.getElementById('heroInner');
+if(heroEl&&heroInner){
+  heroEl.addEventListener('mousemove',e=>{
+    const r=heroEl.getBoundingClientRect();
+    const x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;
+    heroInner.style.transform=`perspective(1200px) rotateY(${x*6}deg) rotateX(${-y*6}deg) translateZ(15px)`;
+  });
+  heroEl.addEventListener('mouseleave',()=>{
+    heroInner.style.transform='perspective(1200px) rotateY(0deg) rotateX(0deg) translateZ(0)';
+  });
+}
+
+// ── ACTE STAGGER ──
+document.querySelectorAll('.acte').forEach((el,i)=>{
+  el.style.transitionDelay=(i%8)*.03+'s';
+});
+
+// ── PARALLAX ORBS ──
+if(!window.matchMedia('(prefers-reduced-motion:reduce)').matches){
+  window.addEventListener('scroll',()=>{
+    const y=window.scrollY;
+    document.querySelectorAll('.hero-orb').forEach((o,i)=>{o.style.transform=`translateY(${y*(.08+i*.03)}px)`});
+  },{passive:true});
+}
+
+// ── PROGRESS BAR ──
+const prog=document.getElementById('prog');
+window.addEventListener('scroll',()=>{
+  const st=window.scrollY,dh=document.documentElement.scrollHeight-window.innerHeight;
+  prog.style.transform=`scaleX(${st/dh})`;
+});
+
+// ── SPARKLE BURST ──
+function createSparkles(x,y,count=8){
+  const container=document.createElement('div');
+  container.className='sparkle';
+  container.style.left=x+'px';container.style.top=y+'px';
+  for(let i=0;i<count;i++){
+    const s=document.createElement('div');
+    s.className='sparkle-inner';
+    const angle=(Math.PI*2/count)*i+Math.random()*.5;
+    const dist=25+Math.random()*35;
+    s.style.setProperty('--tx',Math.cos(angle)*dist+'px');
+    s.style.setProperty('--ty',Math.sin(angle)*dist+'px');
+    s.style.animationDelay=Math.random()*.1+'s';
+    container.appendChild(s);
+  }
+  document.body.appendChild(container);
+  setTimeout(()=>container.remove(),1200);
+}
+
+// ── RIPPLE ON CLICK ──
+document.addEventListener('click',e=>{
+  if(e.target.closest('a,button,.btn-glow,.btn-outline2,.srv-card,.acte,.c-item,.pill')){
+    const rip=document.createElement('div');
+    rip.className='ripple-el';
+    rip.style.left=e.clientX+'px';rip.style.top=e.clientY+'px';
+    document.body.appendChild(rip);
+    setTimeout(()=>rip.remove(),900);
+    createSparkles(e.clientX,e.clientY,6);
+  }
+});
+
+// ── AMBIENT SPARKLES ──
+(function ambientSparkles(){
+  let lastT=0;
+  function spawn(){
+    const now=Date.now();
+    if(now-lastT>1200+Math.random()*1800){
+      lastT=now;
+      const x=Math.random()*window.innerWidth,y=Math.random()*window.innerHeight;
+      createSparkles(x,y,2+Math.floor(Math.random()*2));
+    }
+    requestAnimationFrame(spawn);
+  }
+  setTimeout(spawn,3000);
+})();
+
+console.log('%c🩺 Dr Mohamed Cherif Allali — Médecin Généraliste Tanger','color:#00C9A7;font-size:18px;font-weight:bold;font-family:Playfair Display,serif');
+console.log('%c« Votre santé, notre priorité »','color:#E8B86D;font-size:13px;font-style:italic');
+</script>
+</body>
+</html>
